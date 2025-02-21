@@ -6,6 +6,8 @@ export default {
   theme: {
     extend: {
       colors: {
+        heading: "#CEE2EB",
+        link: "#068AC2",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
