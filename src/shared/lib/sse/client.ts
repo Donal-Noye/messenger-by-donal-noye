@@ -4,7 +4,7 @@ import {useToast} from "@/shared/lib/react/use-toast";
 
 export function useEventSource<T>(url: string, onData?: (data: T) => void) {
   const [isPending, setIsPending] = useState(true);
-  const [data, setData] = useState<T>();
+  const [data, setData] = useState<T | undefined>();
   const [error, setError] = useState<unknown | undefined>();
   const [groupName, setGroupName] = useState<string | undefined>();
   const router = useRouter();
@@ -23,10 +23,6 @@ export function useEventSource<T>(url: string, onData?: (data: T) => void) {
           })
           router.push("/");
           return;
-        }
-
-        if (data.type === "message-created") {
-          console.log("message-created")
         }
 
         if (data.name) {

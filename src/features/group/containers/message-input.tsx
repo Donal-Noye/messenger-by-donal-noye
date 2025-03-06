@@ -59,8 +59,9 @@ export function MessageInput({
             <FormItem>
               <FormControl>
                 <AutosizeTextarea
+                  autoFocus
                   maxHeight={200}
-                  className="bg-transparent border border-[#4E4E4E] pr-20"
+                  className="bg-transparent border border-[#4E4E4E] pr-20 focus-visible:ring-offset-0 focus-visible:ring-0"
                   placeholder="Type here..."
                   disabled={isPending}
                   onKeyDown={handleKeyDown}

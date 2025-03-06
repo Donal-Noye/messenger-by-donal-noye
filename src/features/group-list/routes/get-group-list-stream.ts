@@ -22,14 +22,6 @@ export async function getGroupListStream(req: NextRequest) {
     };
     await sendUpdate();
 
-    // const userGroups = await getGroupList(user.id);
-
-    // const subscriptions = await Promise.all(
-    //   userGroups.map(group =>
-    //     groupEvents.addGroupChangedListener(group.id, sendUpdate)
-    //   )
-    // );
-
     const globalSubs = await Promise.all([
       groupEvents.addGroupCreatedListener(sendUpdate),
       groupEvents.addGroupDeletedListener(sendUpdate),
@@ -37,7 +29,6 @@ export async function getGroupListStream(req: NextRequest) {
     ]);
 
     addCloseListener(() => {
-      // subscriptions.forEach(unsub => unsub());
       globalSubs.forEach(unsub => unsub());
     });
 

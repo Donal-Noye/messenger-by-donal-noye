@@ -11,13 +11,7 @@ async function getMessages(where: Prisma.MessageWhereInput) {
   return prisma.message.findMany({
     where,
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-        },
-      },
+      user: true
     },
     orderBy: {
       createdAt: "asc",
@@ -25,7 +19,21 @@ async function getMessages(where: Prisma.MessageWhereInput) {
   });
 }
 
+async function getMessage(where: Prisma.MessageWhereInput) {
+  return prisma.message.findFirst({
+    where,
+  })
+}
+
+async function deleteMessage(messageId: string) {
+  return prisma.message.delete({
+    where: { id: messageId },
+  });
+}
+
 export const messageRepository = {
   sendMessage,
   getMessages,
+  deleteMessage,
+  getMessage
 };

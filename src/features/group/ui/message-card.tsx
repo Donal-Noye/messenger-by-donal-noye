@@ -2,19 +2,26 @@ import { GroupDomain } from "@/entities/group";
 import { cn } from "@/shared/lib/css";
 import { format } from "date-fns";
 import { UserSheet } from "@/features/group/ui/user-sheet";
+import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from "@/shared/ui/context-menu";
 
 export function MessageCard({
   message,
   userId,
+  deleteAction,
 }: {
   message: GroupDomain.MessageEntity;
   userId: string;
+  deleteAction: React.ReactNode
 }) {
   const isCurrentUser = message.userId === userId;
 
+  if (!message.user) {
+    return null;
+  }
+
   return (
-    <>
-      <div
+    <ContextMenu>
+      <ContextMenuTrigger
         className={cn(
           "max-w-[80%] w-fit flex gap-3 items-start",
           isCurrentUser ? "ml-auto" : "mr-auto",
@@ -49,7 +56,11 @@ export function MessageCard({
             </p>
           </div>
         </div>
-      </div>
-    </>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem>Change</ContextMenuItem>
+        <ContextMenuItem asChild>{deleteAction}</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }

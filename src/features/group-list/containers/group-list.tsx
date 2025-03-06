@@ -4,5 +4,5 @@ import { GroupListClient } from "@/features/group-list/containers/group-list-cli
 export const GroupList = async ({ userId }: { userId: string }) => {
   const groups = await getGroupList(userId);
 
-  return <GroupListClient groups={groups} />;
+  return <GroupListClient groups={groups} userId={userId} />;
 };

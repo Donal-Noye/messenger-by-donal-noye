@@ -51,7 +51,7 @@ export function useGroupEditForm({
         router.refresh();
       }
     },
-    right(undefined),
+    null
   );
 
   const onSubmit = async (values: UpdateGroupFormSchema) => {

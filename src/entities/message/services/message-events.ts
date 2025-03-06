@@ -9,11 +9,19 @@ type MessageCreated = {
   type: "message-created";
   data: GroupDomain.MessageEntity;
 };
+type MessageDeleted = {
+  type: "message-deleted";
+  data: { messageId: string };
+};
 type TypingEvent = {
   type: "typing";
   data: { userId: string; groupId: string; isTyping: boolean };
 };
-type MessageEvent = MessageChanged | MessageCreated | TypingEvent;
+type MessageEvent =
+  | MessageChanged
+  | MessageCreated
+  | TypingEvent
+  | MessageDeleted;
 
 class MessageEventsService {
   eventsChannel = new EventsChannel("message");
@@ -36,7 +44,18 @@ class MessageEventsService {
     });
   }
 
-  async addTypingListener(groupId: string, listener: (event: TypingEvent) => void) {
+  async addMessageDeletedListener(
+    listener: (event: MessageDeleted) => void,
+  ) {
+    return this.eventsChannel.concume("group-deleted", (data) => {
+      listener(data as MessageDeleted);
+    });
+  }
+
+  async addTypingListener(
+    groupId: string,
+    listener: (event: TypingEvent) => void,
+  ) {
     return this.eventsChannel.concume(groupId, (data) => {
       listener(data as TypingEvent);
     });
@@ -49,6 +68,10 @@ class MessageEventsService {
 
     if (event.type === "message-created") {
       return this.eventsChannel.emit(event.data.groupId, event);
+    }
+
+    if (event.type === "message-deleted") {
+      return this.eventsChannel.emit("group-deleted", event);
     }
 
     if (event.type === "typing") {

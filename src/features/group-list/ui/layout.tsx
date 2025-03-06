@@ -13,10 +13,8 @@ export function GroupListLayout({actions, search, children}: {
         </h1>
         {actions}
       </div>
-      <div className="">
-        {search}
-      </div>
-      <ScrollArea className="h-[75%]">
+      {search}
+      <ScrollArea className="h-[75%]" autoScroll={false}>
         <div className="flex flex-col gap-2">
           {children}
         </div>

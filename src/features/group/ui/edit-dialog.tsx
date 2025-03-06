@@ -10,11 +10,11 @@ import {
   FormMessage,
 } from "@/shared/ui/form";
 import { UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { updateGroupFormSchema } from "@/features/group/containers/group-client";
 import { DeleteButton } from "@/features/group/ui/delete-button";
 import { DialogLayout } from "@/shared/ui/dialog-layout";
 import { SubmitButton } from "@/features/auth/ui/submit-button";
+import { updateGroupFormSchema } from "@/features/group/model/use-group-edit-form";
+import { z } from "zod";
 
 export function GroupEditDialog({
   onDeleteAction,

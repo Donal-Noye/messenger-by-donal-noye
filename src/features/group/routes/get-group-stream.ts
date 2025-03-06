@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { sseStream } from "@/shared/lib/sse/server";
 import { getGroupById, groupEvents } from "@/entities/group/server";
+import { messageEvents } from "@/entities/message/server";
 
 export async function getGroupStream(
   req: NextRequest,
@@ -25,6 +26,11 @@ export async function getGroupStream(
       write(event.data),
     );
 
+    const unwatchMember = await groupEvents.addMemberAddedListener(
+      group.id,
+      (event) => write(event.data),
+    );
+
     const unwatchDelete = await groupEvents.addGroupDeletedListener(
       ({ data }) => {
         if (data.groupId === group.id) {
@@ -33,9 +39,17 @@ export async function getGroupStream(
       },
     );
 
+    const unwatchDeleteMessage = await messageEvents.addMessageDeletedListener(
+      ({ data }) => {
+        write({ type: "message-deleted", data });
+      },
+    );
+
     addCloseListener(() => {
       unwatchChange();
+      unwatchMember();
       unwatchDelete();
+      unwatchDeleteMessage();
     });
 
     return response;

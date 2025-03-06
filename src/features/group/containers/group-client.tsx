@@ -5,7 +5,6 @@ import { GroupInfo } from "@/features/group/ui/info";
 import { GroupAvatar } from "@/features/group/ui/avatar";
 import { MessageInput } from "@/features/group/containers/message-input";
 import { GroupEditDialog } from "@/features/group/ui/edit-dialog";
-import { z } from "zod";
 import { useGroupEditForm } from "@/features/group/model/use-group-edit-form";
 import { GroupDomain } from "@/entities/group";
 import { useSendMessageForm } from "@/features/group/model/use-send-message-form";
@@ -13,13 +12,10 @@ import { routes } from "@/kernel/routes";
 import { useEventSource } from "@/shared/lib/sse/client";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 import { MessageCard } from "@/features/group/ui/message-card";
-import { useEffect, useState } from "react";
-
-export const updateGroupFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
+import { Typing } from "@/features/group/ui/typing";
+import { TypingEvent, useTyping } from "@/features/group/model/use-typing";
+import { DeleteMessageButton } from "@/features/group/containers/delete-message-button";
+import { useCallback, useEffect, useState } from "react";
 
 export function GroupClient({
   defaultGroup,
@@ -30,42 +26,50 @@ export function GroupClient({
   userId: string;
   initialMessages: GroupDomain.MessageEntity[];
 }) {
-  const { dataStream: group = defaultGroup } =
-    useEventSource<GroupDomain.GroupEntity>(
-      routes.groupStream(defaultGroup.id),
-    );
+  const [group, setGroup] = useState(defaultGroup);
+  const [messages, setMessages] = useState(initialMessages);
 
-  const { dataStream: messages = initialMessages } = useEventSource<
+  // const { dataStream: group = defaultGroup } =
+  //   useEventSource<GroupDomain.GroupEntity>(
+  //     routes.groupStream(defaultGroup.id),
+  //   );
+
+  const { dataStream: sseData } = useEventSource<any>(routes.groupStream(defaultGroup.id));
+
+  useEffect(() => {
+    if (!sseData) return;
+
+    switch (sseData.type) {
+      case "group-changed":
+        setGroup(sseData.data);
+        break;
+      case "message-deleted":
+        setMessages(prev =>
+          prev.filter(msg => msg.id !== sseData.data.messageId)
+        );
+        break;
+      case "group-deleted":
+        break;
+    }
+  }, [sseData]);
+
+  const { dataStream: messageStream } = useEventSource<
     GroupDomain.MessageEntity[]
   >(routes.messageStream(defaultGroup.id));
 
-  const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
-
-  const { dataStream: typingEvents } = useEventSource<{
-    type: "typing";
-    data: { userId: string; isTyping: boolean };
-  }>(routes.typingStream(defaultGroup.id));
-
   useEffect(() => {
-    if (typingEvents?.type === "typing") {
-      setTypingUsers((prev) => {
-        const updatedUsers = {
-          ...prev,
-          [typingEvents.data.userId]: typingEvents.data.isTyping,
-        };
-
-        if (!typingEvents.data.isTyping) {
-          setTypingUsers((prev) => {
-            const newState = { ...prev };
-            delete newState[typingEvents.data.userId];
-            return newState;
-          });
-        }
-
-        return updatedUsers;
-      });
+    if (Array.isArray(messageStream)) {
+      setMessages(messageStream);
     }
-  }, [typingEvents]);
+  }, [messageStream]);
+
+  const handleDeleteSuccess = useCallback((deletedMessageId: string) => {
+    setMessages((prev) => prev.filter((m) => m.id !== deletedMessageId));
+  }, []);
+
+  const { typingUsers } = useTyping(
+    useEventSource<TypingEvent>(routes.typingStream(defaultGroup.id)).dataStream!
+  );
 
   const {
     form,
@@ -115,21 +119,24 @@ export function GroupClient({
       <ScrollArea autoScroll>
         <div className="flex flex-col space-y-5 justify-end h-full p-6">
           {messages.map((message) => (
-            <MessageCard message={message} key={message.id} userId={userId} />
+            <MessageCard
+              deleteAction={
+                <DeleteMessageButton
+                  groupId={group.id}
+                  onSuccess={() => handleDeleteSuccess(message.id)}
+                  messageId={message.id}
+                />
+              }
+              message={message}
+              key={message.id}
+              userId={userId}
+            />
           ))}
-          {Object.keys(typingUsers).filter((id) => id !== userId).length > 0 && (
-            <div className="text-sm text-secondary animate-pulse">
-              {Object.keys(typingUsers)
-                .filter((id) => id !== userId)
-                .map((id) => {
-                  const member = group.members.find((m) => m.userId === id);
-                  return member?.user?.name || "Unknown user";
-                })
-                .filter(Boolean)
-                .join(", ")}{" "}
-              is typing...
-            </div>
-          )}
+          <Typing
+            typingUsers={typingUsers}
+            members={group.members}
+            userId={userId}
+          />
         </div>
       </ScrollArea>
     </GroupLayout>

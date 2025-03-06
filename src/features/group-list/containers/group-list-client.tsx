@@ -1,6 +1,5 @@
 "use client";
 
-import { GroupEntity } from "@/entities/group/domain";
 import { CreateButton } from "@/features/group-list/server";
 import { GroupListLayout } from "@/features/group-list/ui/layout";
 import { SearchGroup } from "@/features/group-list/containers/search-group";
@@ -9,10 +8,16 @@ import { useRouter } from "next/navigation";
 import { routes } from "@/kernel/routes";
 import { useEventSource } from "@/shared/lib/sse/client";
 import { GroupDomain } from "@/entities/group";
-import {searchItems} from "@/shared/lib/search-items";
-import {useState} from "react";
+import { searchItems } from "@/shared/lib/search-items";
+import { useState } from "react";
 
-export const GroupListClient = ({ groups }: { groups: GroupEntity[] }) => {
+export const GroupListClient = ({
+  groups,
+  userId
+}: {
+  groups: GroupDomain.GroupEntity[];
+  userId: string;
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { dataStream = groups } = useEventSource<GroupDomain.GroupEntity[]>(
@@ -33,7 +38,7 @@ export const GroupListClient = ({ groups }: { groups: GroupEntity[] }) => {
       actions={<CreateButton onSuccess={handleSuccess} />}
     >
       {filteredGroups.map((group) => (
-        <GroupCard key={group.id} name={group.name} id={group.id} />
+        <GroupCard userId={userId} key={group.id} group={group} />
       ))}
     </GroupListLayout>
   );

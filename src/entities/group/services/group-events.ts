@@ -16,7 +16,7 @@ type GroupMemberAdd = {
   type: "member-added";
   data: {
     groupId: string;
-    member: GroupDomain.MemberEntity
+    member: GroupDomain.MemberEntity;
   };
 };
 type GroupEvent = GroupChanged | GroupCreated | GroupDeleted | GroupMemberAdd;
@@ -24,9 +24,7 @@ type GroupEvent = GroupChanged | GroupCreated | GroupDeleted | GroupMemberAdd;
 class GroupEventsService {
   eventsChannel = new EventsChannel("group");
 
-  async addGroupChangedListener(
-    listener: (event: GroupChanged) => void,
-  ) {
+  async addGroupChangedListener(listener: (event: GroupChanged) => void) {
     return this.eventsChannel.concume("group-changed", (data) => {
       listener(data as GroupChanged);
     });
@@ -67,7 +65,7 @@ class GroupEventsService {
     }
 
     if (event.type === "member-added") {
-      return this.eventsChannel.emit("member-added", event);
+      return this.eventsChannel.emit(event.data.groupId, event);
     }
   }
 }

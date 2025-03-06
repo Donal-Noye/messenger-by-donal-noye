@@ -1,11 +1,11 @@
 export type SessionEntity = {
 	id: string;
 	email: string;
-	avatar?: string | null;
+	avatar?: string;
 	isOnline?: boolean;
-	status?: string | null;
-	phone?: number | null;
-	lastSeen?: Date | string;
+	status?: string;
+	phone?: number;
+	lastSeen?: Date;
 	name: string;
 	expiredAt: string;
 }
@@ -15,10 +15,10 @@ export type UserEntity = {
 	name: string;
 	email: string;
 	avatar?: string | null;
-	isOnline?: boolean;
+	isOnline?: boolean | null;
 	status?: string | null;
 	phone?: number | null;
-	lastSeen?: Date | string;
+	lastSeen?: Date;
 	passwordHash: string;
 	salt: string;
 }

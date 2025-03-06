@@ -2,7 +2,11 @@ import { getCurrentUser } from "@/entities/user/server";
 import { NextRequest } from "next/server";
 import { getGroupById } from "@/entities/group/services/get-group";
 import { sseStream } from "@/shared/lib/sse/server";
-import {deleteGroup, getGroupList, groupEvents} from "@/entities/group/server";
+import {
+  deleteGroup,
+  getGroupList,
+  groupEvents,
+} from "@/entities/group/server";
 
 export async function deleteGroupStream(
   req: NextRequest,
@@ -25,14 +29,14 @@ export async function deleteGroupStream(
 
   const { write, response, addCloseListener } = sseStream(req);
 
-  write({ type: "group-deleted", groupId: group.id })
+  write({ type: "group-deleted", groupId: group.id });
 
-  await deleteGroup(group.id)
+  await deleteGroup(group.id);
 
   write(await getGroupList(user.id));
 
   addCloseListener(
-    await groupEvents.addGroupChangedListener(group.id, async () => {
+    await groupEvents.addGroupChangedListener(async () => {
       write(await getGroupList(user.id));
     }),
   );
