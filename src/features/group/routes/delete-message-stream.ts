@@ -1,8 +1,11 @@
 import { getCurrentUser } from "@/entities/user/server";
 import { NextRequest } from "next/server";
 import { sseStream } from "@/shared/lib/sse/server";
-import {deleteMessage, getMessageById, messageEvents} from "@/entities/message/server";
-import {getGroupById, groupEvents} from "@/entities/group/server";
+import {
+  deleteMessage,
+  getMessageById,
+} from "@/entities/message/server";
+import { getGroupById } from "@/entities/group/server";
 
 export async function deleteMessageStream(
   req: NextRequest,
@@ -29,14 +32,7 @@ export async function deleteMessageStream(
 
   write({ type: "message-deleted", messageId: message.id });
 
-  await messageEvents.emit({
-    type: "message-deleted",
-    data: {
-      messageId
-    },
-  });
-
-  await deleteMessage(group.id, message.id);
+  await deleteMessage(message.id);
 
   return response;
 }

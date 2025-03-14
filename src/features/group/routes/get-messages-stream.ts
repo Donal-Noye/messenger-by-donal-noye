@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/entities/user/server";
 import { getGroupById } from "@/entities/group/server";
 import { sseStream } from "@/shared/lib/sse/server";
 import {getMessages, messageEvents} from "@/entities/message/server";
-import { groupEvents } from "@/entities/group/services/group-events";
 
 export async function getMessagesStream(
   req: NextRequest,
@@ -23,22 +22,30 @@ export async function getMessagesStream(
 
   write(await getMessages(group.id));
 
-  const unsubscribeGroupChanged = await groupEvents.addGroupChangedListener(
-    async () => {
-      write(await getMessages(group.id));
-    },
-  );
-
-  const unsubscribeGroupCreated = await messageEvents.addMessageCreatedListener(
+  const unsubscribeMessageChanged = await messageEvents.addMessageUpdatedListener(
     group.id,
     async () => {
       write(await getMessages(group.id));
     },
   );
 
+  const unsubscribeMessageCreated = await messageEvents.addMessageCreatedListener(
+    group.id,
+    async () => {
+      write(await getMessages(group.id));
+    },
+  );
+
+  const unwatchDeleteMessage = await messageEvents.addMessageDeletedListener(
+    async () => {
+      write(await getMessages(group.id));
+    },
+  );
+
   addCloseListener(() => {
-    unsubscribeGroupChanged();
-    unsubscribeGroupCreated();
+    unsubscribeMessageChanged();
+    unsubscribeMessageCreated();
+    unwatchDeleteMessage()
   });
 
   return response;

@@ -1,7 +1,8 @@
 import { getCurrentUser } from "@/entities/user/server";
-import {NextRequest, NextResponse} from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getGroupById } from "@/entities/group/services/get-group";
 import { updateGroup } from "@/entities/group/server";
+import { sseStream } from "@/shared/lib/sse/server";
 
 export async function updateGroupStream(
   req: NextRequest,
@@ -23,7 +24,11 @@ export async function updateGroupStream(
     });
   }
 
+  const { write } = sseStream(req);
+
   const updatedGroup = await updateGroup(id, updatedGroupName);
+
+  write({ type: "group-changed", data: updatedGroup });
 
   return NextResponse.json(updatedGroup.value);
 }

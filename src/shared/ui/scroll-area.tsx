@@ -17,7 +17,7 @@ const ScrollArea = React.forwardRef<
     }
   }, []);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (!viewportRef.current || !autoScroll) return;
 
     const observer = new MutationObserver(() => {

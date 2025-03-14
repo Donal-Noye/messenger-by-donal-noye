@@ -1,4 +1,5 @@
-export {deleteMessageStream} from "@/features/group/routes/delete-message-stream";
+export { updateMessageStream } from "@/features/group/routes/update-message-stream";
+export { deleteMessageStream } from "@/features/group/routes/delete-message-stream";
 export { updateOnlineStatusStream } from "@/features/group/routes/update-online-status-stream";
 export { getOnlineStatusStream } from "@/features/group/routes/get-online-status-stream";
 export { postTypingStream } from "@/features/group/routes/post-typing-stream";

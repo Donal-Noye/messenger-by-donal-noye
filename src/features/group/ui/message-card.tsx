@@ -2,16 +2,23 @@ import { GroupDomain } from "@/entities/group";
 import { cn } from "@/shared/lib/css";
 import { format } from "date-fns";
 import { UserSheet } from "@/features/group/ui/user-sheet";
-import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from "@/shared/ui/context-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/shared/ui/context-menu";
 
 export function MessageCard({
   message,
   userId,
   deleteAction,
+  onEdit,
 }: {
   message: GroupDomain.MessageEntity;
   userId: string;
-  deleteAction: React.ReactNode
+  deleteAction: React.ReactNode;
+  onEdit: (message: GroupDomain.MessageEntity) => void;
 }) {
   const isCurrentUser = message.userId === userId;
 
@@ -22,6 +29,7 @@ export function MessageCard({
   return (
     <ContextMenu>
       <ContextMenuTrigger
+        disabled={!isCurrentUser}
         className={cn(
           "max-w-[80%] w-fit flex gap-3 items-start",
           isCurrentUser ? "ml-auto" : "mr-auto",
@@ -57,8 +65,13 @@ export function MessageCard({
           </div>
         </div>
       </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem>Change</ContextMenuItem>
+      <ContextMenuContent className="space-y-1.5">
+        <ContextMenuItem
+          className="cursor-pointer justify-center"
+          onClick={() => onEdit(message)}
+        >
+          Change
+        </ContextMenuItem>
         <ContextMenuItem asChild>{deleteAction}</ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

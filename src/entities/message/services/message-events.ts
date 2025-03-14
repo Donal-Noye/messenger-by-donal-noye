@@ -1,9 +1,9 @@
 import { GroupDomain } from "@/entities/group";
 import { EventsChannel } from "@/shared/lib/events";
 
-type MessageChanged = {
-  type: "message-changed";
-  data: GroupDomain.MessageEntity;
+type MessageUpdated = {
+  type: "message-updated";
+  data: { content: string };
 };
 type MessageCreated = {
   type: "message-created";
@@ -18,7 +18,7 @@ type TypingEvent = {
   data: { userId: string; groupId: string; isTyping: boolean };
 };
 type MessageEvent =
-  | MessageChanged
+  | MessageUpdated
   | MessageCreated
   | TypingEvent
   | MessageDeleted;
@@ -26,12 +26,12 @@ type MessageEvent =
 class MessageEventsService {
   eventsChannel = new EventsChannel("message");
 
-  async addMessageChangedListener(
+  async addMessageUpdatedListener(
     groupId: string,
-    listener: (event: MessageChanged) => void,
+    listener: (event: MessageUpdated) => void,
   ) {
     return this.eventsChannel.concume(groupId, (data) => {
-      listener(data as MessageChanged);
+      listener(data as MessageUpdated);
     });
   }
 
@@ -44,10 +44,8 @@ class MessageEventsService {
     });
   }
 
-  async addMessageDeletedListener(
-    listener: (event: MessageDeleted) => void,
-  ) {
-    return this.eventsChannel.concume("group-deleted", (data) => {
+  async addMessageDeletedListener(listener: (event: MessageDeleted) => void) {
+    return this.eventsChannel.concume("message-deleted", (data) => {
       listener(data as MessageDeleted);
     });
   }
@@ -62,8 +60,8 @@ class MessageEventsService {
   }
 
   emit(event: MessageEvent) {
-    if (event.type === "message-changed") {
-      return this.eventsChannel.emit(event.data.id, event);
+    if (event.type === "message-updated") {
+      return this.eventsChannel.emit("message-updated", event);
     }
 
     if (event.type === "message-created") {
@@ -71,7 +69,7 @@ class MessageEventsService {
     }
 
     if (event.type === "message-deleted") {
-      return this.eventsChannel.emit("group-deleted", event);
+      return this.eventsChannel.emit("message-deleted", event);
     }
 
     if (event.type === "typing") {

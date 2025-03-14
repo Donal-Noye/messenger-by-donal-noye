@@ -1,7 +1,11 @@
 "use server";
 
-import {getGroupById, groupEvents, updateGroup} from "@/entities/group/server";
-import {left} from "@/shared/lib/either";
+import {
+  getGroupById,
+  groupEvents,
+  updateGroup,
+} from "@/entities/group/server";
+import { left } from "@/shared/lib/either";
 
 export const updateGroupAction = async (name: string, groupId: string) => {
   const updatedNameGroup = updateGroup(groupId, name);

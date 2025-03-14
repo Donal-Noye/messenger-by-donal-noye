@@ -6,17 +6,15 @@ import { startTransition } from "react";
 import { Loader } from "lucide-react";
 
 export const DeleteMessageButton = ({
-  groupId,
   messageId,
   onSuccess,
 }: {
-  groupId: string;
   messageId: string;
   onSuccess: () => void;
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, dispatch, isPending] = useActionState(async () => {
-    const result = await deleteMessageAction(groupId, messageId);
+    const result = await deleteMessageAction(messageId);
     if (result.type === "right") {
       onSuccess();
     }

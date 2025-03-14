@@ -37,11 +37,6 @@ async function getGroup(where: Prisma.GroupWhereUniqueInput) {
           user: true
         }
       },
-      messages: {
-        include: {
-          user: true
-        }
-      }
     }
   });
 }

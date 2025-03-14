@@ -15,7 +15,9 @@ import { MessageCard } from "@/features/group/ui/message-card";
 import { Typing } from "@/features/group/ui/typing";
 import { TypingEvent, useTyping } from "@/features/group/model/use-typing";
 import { DeleteMessageButton } from "@/features/group/containers/delete-message-button";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { groupMessagesByDate } from "@/shared/lib/groupMessagesByDate";
+import { Badge } from "@/shared/ui/badge";
 
 export function GroupClient({
   defaultGroup,
@@ -26,49 +28,37 @@ export function GroupClient({
   userId: string;
   initialMessages: GroupDomain.MessageEntity[];
 }) {
-  const [group, setGroup] = useState(defaultGroup);
-  const [messages, setMessages] = useState(initialMessages);
+  const { dataStream: group = defaultGroup } =
+    useEventSource<GroupDomain.GroupEntity>(
+      routes.groupStream(defaultGroup.id),
+    );
 
-  // const { dataStream: group = defaultGroup } =
-  //   useEventSource<GroupDomain.GroupEntity>(
-  //     routes.groupStream(defaultGroup.id),
-  //   );
-
-  const { dataStream: sseData } = useEventSource<any>(routes.groupStream(defaultGroup.id));
-
-  useEffect(() => {
-    if (!sseData) return;
-
-    switch (sseData.type) {
-      case "group-changed":
-        setGroup(sseData.data);
-        break;
-      case "message-deleted":
-        setMessages(prev =>
-          prev.filter(msg => msg.id !== sseData.data.messageId)
-        );
-        break;
-      case "group-deleted":
-        break;
-    }
-  }, [sseData]);
-
-  const { dataStream: messageStream } = useEventSource<
+  const { dataStream: messages = initialMessages, setData } = useEventSource<
     GroupDomain.MessageEntity[]
   >(routes.messageStream(defaultGroup.id));
 
-  useEffect(() => {
-    if (Array.isArray(messageStream)) {
-      setMessages(messageStream);
-    }
-  }, [messageStream]);
+  const [editingMessage, setEditingMessage] = useState<{
+    id: string;
+    content: string;
+  } | null>(null);
 
-  const handleDeleteSuccess = useCallback((deletedMessageId: string) => {
-    setMessages((prev) => prev.filter((m) => m.id !== deletedMessageId));
-  }, []);
+  const handleEditMessage = useCallback(
+    (message: GroupDomain.MessageEntity) => {
+      setEditingMessage({ id: message.id, content: message.content });
+    },
+    [],
+  );
+
+  const handleDelete = useCallback(
+    (deletedMessageId: string) => {
+      setData((prev) => prev?.filter((m) => m.id !== deletedMessageId));
+    },
+    [setData],
+  );
 
   const { typingUsers } = useTyping(
-    useEventSource<TypingEvent>(routes.typingStream(defaultGroup.id)).dataStream!
+    useEventSource<TypingEvent>(routes.typingStream(defaultGroup.id))
+      .dataStream!,
   );
 
   const {
@@ -87,7 +77,22 @@ export function GroupClient({
   const { formMessage, onSubmitMessage, isPending } = useSendMessageForm({
     groupId: group.id,
     userId,
+    editingMessage,
+    onEditComplete: () => setEditingMessage(null),
   });
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [messages]);
+
+  const groupedMessages = groupMessagesByDate(messages);
 
   return (
     <GroupLayout
@@ -108,29 +113,40 @@ export function GroupClient({
       avatar={<GroupAvatar name={group.name} />}
       messageInput={
         <MessageInput
+          key={editingMessage?.id || "new-message"}
           onSubmitAction={onSubmitMessage}
           form={formMessage}
           isPending={isPending}
           groupId={group.id}
           userId={userId}
+          editingMessage={editingMessage}
+          onCancelEdit={() => setEditingMessage(null)}
         />
       }
     >
-      <ScrollArea autoScroll>
+      <ScrollArea autoScroll className="h-full">
         <div className="flex flex-col space-y-5 justify-end h-full p-6">
-          {messages.map((message) => (
-            <MessageCard
-              deleteAction={
-                <DeleteMessageButton
-                  groupId={group.id}
-                  onSuccess={() => handleDeleteSuccess(message.id)}
-                  messageId={message.id}
+          {Object.entries(groupedMessages).map(([dateLabel, msgs]) => (
+            <div key={dateLabel} className="space-y-3">
+              <div className="flex justify-center">
+                <Badge className="py-2 bg-muted text-white">{dateLabel}</Badge>
+              </div>
+
+              {msgs.map((message) => (
+                <MessageCard
+                  deleteAction={
+                    <DeleteMessageButton
+                      onSuccess={() => handleDelete(message.id)}
+                      messageId={message.id}
+                    />
+                  }
+                  message={message}
+                  key={message.id}
+                  userId={userId}
+                  onEdit={handleEditMessage}
                 />
-              }
-              message={message}
-              key={message.id}
-              userId={userId}
-            />
+              ))}
+            </div>
           ))}
           <Typing
             typingUsers={typingUsers}
@@ -138,6 +154,7 @@ export function GroupClient({
             userId={userId}
           />
         </div>
+        <div ref={messagesEndRef} />
       </ScrollArea>
     </GroupLayout>
   );

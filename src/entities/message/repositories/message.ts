@@ -11,7 +11,7 @@ async function getMessages(where: Prisma.MessageWhereInput) {
   return prisma.message.findMany({
     where,
     include: {
-      user: true
+      user: true,
     },
     orderBy: {
       createdAt: "asc",
@@ -22,7 +22,19 @@ async function getMessages(where: Prisma.MessageWhereInput) {
 async function getMessage(where: Prisma.MessageWhereInput) {
   return prisma.message.findFirst({
     where,
-  })
+  });
+}
+
+async function updateMessage(
+  messageId: string,
+  content: string,
+) {
+  return prisma.message.update({
+    where: { id: messageId },
+    data: {
+      content
+    },
+  });
 }
 
 async function deleteMessage(messageId: string) {
@@ -35,5 +47,6 @@ export const messageRepository = {
   sendMessage,
   getMessages,
   deleteMessage,
-  getMessage
+  getMessage,
+  updateMessage,
 };

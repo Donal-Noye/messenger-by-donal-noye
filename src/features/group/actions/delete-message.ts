@@ -7,7 +7,7 @@ import {
   messageEvents,
 } from "@/entities/message/server";
 
-export const deleteMessageAction = async (groupId: string, messageId: string) => {
+export const deleteMessageAction = async (messageId: string) => {
   const message = await getMessageById(messageId);
 
   if (!message) {
@@ -16,10 +16,8 @@ export const deleteMessageAction = async (groupId: string, messageId: string) =>
 
   await messageEvents.emit({
     type: "message-deleted",
-    data: {
-      messageId,
-    },
+    data: { messageId },
   });
 
-  return deleteMessage(groupId, messageId);
+  return deleteMessage(messageId);
 };
