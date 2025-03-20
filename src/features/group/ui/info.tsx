@@ -1,4 +1,4 @@
-import { MembersDialog } from "@/features/group/ui/members-dialog";
+import { MembersDialog } from "@/features/group/containers/members-dialog";
 import { GroupDomain } from "@/entities/group";
 import { useState } from "react";
 

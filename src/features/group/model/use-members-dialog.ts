@@ -34,7 +34,7 @@ export function useMembersDialog(
 	const [_, dispatch, isPending] = useActionState(
 		async (_: any, values: z.infer<typeof formSchema>) => {
 			const result = await addMemberToGroupAction(groupId, values.userId);
-			matchEither(result.value, {
+			matchEither(result, {
 				left: (errorMessage) => {
 					toast({
 						description: errorMessage,

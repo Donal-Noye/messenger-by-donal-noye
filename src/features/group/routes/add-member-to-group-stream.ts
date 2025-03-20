@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/entities/user/services/get-current-user";
 import { getGroupById } from "@/entities/group/services/get-group";
 import { sseStream } from "@/shared/lib/sse/server";
-import { addMemberToGroupAction } from "@/features/group/actions/add-member-to-group";
+import {addMember} from "@/entities/group/services/add-member";
 
 export async function addMemberToGroupStream(
   req: NextRequest,
@@ -23,7 +23,7 @@ export async function addMemberToGroupStream(
     return response;
   }
 
-  const result = await addMemberToGroupAction(group.id, user.id);
+  const result = await addMember(group.id, user.id);
 
   return NextResponse.json(result);
 }

@@ -1,9 +1,16 @@
 "use server";
 
 import { left } from "@/shared/lib/either";
-import {getMessageById, messageEvents, updateMessage} from "@/entities/message/server";
+import {
+  getMessageById,
+  messageEvents,
+  updateMessage,
+} from "@/entities/message/server";
 
-export const updateMessageAction = async (messageId: string, content: string) => {
+export const updateMessageAction = async (
+  messageId: string,
+  content: string,
+) => {
   const updatedContent = updateMessage(messageId, content);
   const updatedMessage = await getMessageById(messageId);
 

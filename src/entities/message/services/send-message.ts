@@ -1,7 +1,6 @@
 import { messageRepository } from "@/entities/message/repositories/message";
 import { messageEvents } from "@/entities/message/server";
 import { right } from "@/shared/lib/either";
-import { groupRepository } from "@/entities/group/repositories/group";
 
 export const sendMessageService = async (
   userId: string,
@@ -27,7 +26,7 @@ export const sendMessageService = async (
     content,
   });
 
-  await groupRepository.updateGroup(groupId, { lastMessageAt: new Date() });
+  // await groupRepository.updateGroup(groupId, { lastMessageAt: new Date() });
 
   await messageEvents.emit({
     type: "message-created",

@@ -1,7 +1,7 @@
 "use server";
 
 import {addMember, getGroupById, groupEvents} from "@/entities/group/server";
-import {left, right} from "@/shared/lib/either";
+import {left} from "@/shared/lib/either";
 
 export const addMemberToGroupAction = async (
   groupId: string,
@@ -19,5 +19,5 @@ export const addMemberToGroupAction = async (
     data: updatedGroup,
   });
 
-  return right(addedMember)
+  return addedMember
 };

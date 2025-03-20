@@ -5,7 +5,7 @@ export type GroupEntity = {
 	name: string;
 	creatorId: string;
 	creator: UserDomain.UserEntity;
-	members: MemberEntity[];
+	// members: MemberEntity[];
 };
 
 export type MemberEntity = {

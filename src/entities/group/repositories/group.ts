@@ -12,16 +12,16 @@ async function groupList(userId: string) {
     },
     include: {
       creator: true,
-      members: {
-        include: {
-          user: true,
-        },
-      },
-      messages: {
-	      include: {
-		      user: true,
-	      },
-      },
+      // members: {
+      //   include: {
+      //     user: true,
+      //   },
+      // },
+      // messages: {
+	    //   include: {
+		  //     user: true,
+	    //   },
+      // },
     },
     orderBy: { lastMessageAt: "desc" },
   });
@@ -32,11 +32,11 @@ async function getGroup(where: Prisma.GroupWhereUniqueInput) {
     where,
     include: {
       creator: true,
-      members: {
-        include: {
-          user: true
-        }
-      },
+      // members: {
+      //   include: {
+      //     user: true
+      //   }
+      // },
     }
   });
 }
@@ -71,12 +71,12 @@ async function updateGroup(
     data,
     include: {
       creator: true,
-      messages: true,
-      members: {
-        include: {
-          user: true,
-        },
-      },
+      // messages: true,
+      // members: {
+      //   include: {
+      //     user: true,
+      //   },
+      // },
     },
   });
 }

@@ -1,8 +1,8 @@
 import { getCurrentUser } from "@/entities/user/server";
 import { NextRequest, NextResponse } from "next/server";
 import { getGroupById } from "@/entities/group/services/get-group";
-import { updateGroup } from "@/entities/group/server";
 import { sseStream } from "@/shared/lib/sse/server";
+import {updateMessage} from "@/entities/message/server";
 
 export async function updateMessageStream(
 	req: NextRequest,
@@ -26,7 +26,7 @@ export async function updateMessageStream(
 
 	const { write } = sseStream(req);
 
-	const updatedMessage = await updateGroup(id, updatedContent);
+	const updatedMessage = await updateMessage(id, updatedContent);
 
 	write({ type: "message-changed", data: updatedMessage });
 

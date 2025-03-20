@@ -2,13 +2,14 @@ import { getCurrentUser } from "@/entities/user/server";
 import { redirect } from "next/navigation";
 import { routes } from "@/kernel/routes";
 import { GroupClient } from "@/features/group/containers/group-client";
-import { getGroupById } from "@/entities/group/server";
-import {getMessagesAction} from "@/features/group/actions/get-messages";
+import { getGroupById, getGroupMembers } from "@/entities/group/server";
+import { getMessagesAction } from "@/features/group/actions/get-messages";
 
 export async function Group({ groupId }: { groupId: string }) {
   const user = await getCurrentUser();
   const group = await getGroupById(groupId);
   const messages = await getMessagesAction(groupId);
+  const members = await getGroupMembers(groupId);
 
   if (!user) {
     redirect(routes.signIn());
@@ -23,6 +24,7 @@ export async function Group({ groupId }: { groupId: string }) {
       userId={user.id}
       defaultGroup={group}
       initialMessages={messages}
+      members={members}
     />
   );
 }

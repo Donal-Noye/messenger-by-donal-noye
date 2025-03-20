@@ -11,7 +11,7 @@ import {
 } from "@/shared/ui/form";
 import { messageFormSchema } from "@/features/group/model/use-send-message-form";
 import { AutosizeTextarea } from "@/shared/ui/autosize-textarea";
-import { startTransition, useEffect, useState } from "react";
+import {startTransition, useEffect, useState} from "react";
 import { useDebounce } from "use-debounce";
 import { useTypingMessage } from "@/features/group/model/use-typing-message";
 

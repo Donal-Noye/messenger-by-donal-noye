@@ -41,8 +41,8 @@ export function useSendMessageForm({
       }
       if (result.type === "right") {
         form.reset();
-        form.setFocus("content");
         onEditComplete?.();
+        form.setFocus("content")
       }
     },
     null,

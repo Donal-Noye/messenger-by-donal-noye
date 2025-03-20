@@ -24,35 +24,15 @@ export function useEventSource<T>(url: string, onData?: (data: T) => void) {
         }
 
         switch (data.type) {
-          case "group-changed":
-            setData(data.data);
-            break;
           case "group-deleted":
             toast({
               description: `Group "${groupName}" was deleted`,
             });
             router.push("/");
             break;
-          // case "message-deleted":
-          //   setData((prev) =>
-          //     prev ? (prev.filter((msg) => msg.id !== data.data.messageId) as T) : prev
-          //   );
-          //   break;
           default:
             setData(data);
         }
-
-        // if (data.type === "group-deleted") {
-        //   toast({
-        //     description: `Group "${groupName}" was deleted`,
-        //   });
-        //   router.push("/");
-        //   return;
-        // }
-        //
-        // if (data.type === "message-deleted") {
-        //   console.log("message-deleted")
-        // }
         setError(undefined);
         onData?.(data);
         setIsPending(false);

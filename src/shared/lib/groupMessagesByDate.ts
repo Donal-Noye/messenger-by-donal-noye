@@ -4,6 +4,8 @@ import { GroupDomain } from "@/entities/group";
 type GroupedMessages = Record<string, GroupDomain.MessageEntity[]>;
 
 export const groupMessagesByDate = (messages: GroupDomain.MessageEntity[]): GroupedMessages => {
+	if (!messages.length) return {};
+
 	const grouped: GroupedMessages = {};
 
 	messages.forEach((message) => {
@@ -15,7 +17,7 @@ export const groupMessagesByDate = (messages: GroupDomain.MessageEntity[]): Grou
 		} else if (isYesterday(date)) {
 			label = "Yesterday";
 		} else {
-			label = format(date, "MM/dd/yy");
+			label = format(date, "dd LLLL");
 		}
 
 		if (!grouped[label]) {
