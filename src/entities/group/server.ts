@@ -1,3 +1,4 @@
+export { removeMember } from "@/entities/group/services/remove-member";
 export { groupEvents } from "@/entities/group/services/group-events";
 export { addMember } from "@/entities/group/services/add-member";
 export { getGroupMembers } from "@/entities/group/services/get-group-members";

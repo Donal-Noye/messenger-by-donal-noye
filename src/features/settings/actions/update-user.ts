@@ -16,6 +16,8 @@ export const updateUserAction = async (
       ...session,
       name: updatedUser.name,
       email: updatedUser.email,
+      phone: updatedUser.phone ?? undefined,
+      status: updatedUser.status ?? undefined,
     });
   }
 

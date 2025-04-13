@@ -1,3 +1,4 @@
+export { updateUserActivity } from "@/entities/user/services/update-user-activity";
 export { updateOnlineStatus } from "@/entities/user/services/update-online-status";
 export { updateUser } from "@/entities/user/services/update-user";
 export { updateUserPassword } from "@/entities/user/services/update-user-password";

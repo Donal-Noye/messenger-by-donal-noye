@@ -8,7 +8,7 @@ export default async function GroupPage({
   const { id } = await params;
 
   return (
-    <div className="bg-background h-full rounded-3xl z-10 overflow-hidden relative">
+    <div className="bg-background h-full sm:rounded-3xl overflow-hidden relative z-[100]">
       <Group groupId={id} />
     </div>
   );

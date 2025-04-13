@@ -31,7 +31,7 @@ export const useAutosizeTextArea = ({
       }
       textAreaElement.style.height = `${minHeight + offsetBorder}px`;
       const scrollHeight = textAreaElement.scrollHeight;
-      // We then set the height directly, outside of the render loop
+      // We then set the height directly, outside the render loop
       // Trying to set this with state or a ref will product an incorrect value.
       if (scrollHeight > maxHeight) {
         textAreaElement.style.height = `${maxHeight}px`;
@@ -39,7 +39,7 @@ export const useAutosizeTextArea = ({
         textAreaElement.style.height = `${scrollHeight + offsetBorder}px`;
       }
     }
-  }, [textAreaRef.current, triggerAutoSize]);
+  }, [init, maxHeight, minHeight, textAreaRef, triggerAutoSize]);
 };
 
 export type AutosizeTextAreaRef = {

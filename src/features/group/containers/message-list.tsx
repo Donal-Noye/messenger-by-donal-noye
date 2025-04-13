@@ -1,10 +1,11 @@
 import { GroupDomain } from "@/entities/group";
-import {DeleteMessageButton} from "@/features/group/containers/delete-message-button";
-import {Badge} from "@/shared/ui/badge";
-import {MessageCard} from "@/features/group/ui/message-card";
-import {groupMessagesByDate} from "@/shared/lib/groupMessagesByDate";
+import { DeleteMessageButton } from "@/features/group/containers/delete-message-button";
+import { Badge } from "@/shared/ui/badge";
+import { MessageCard } from "@/features/group/ui/message-card";
+import { groupMessagesByDate } from "@/shared/lib/groupMessagesByDate";
+import { memo, useMemo } from "react";
 
-export function MessageList({
+export const MessageList = memo(function MessageList({
   messages,
   userId,
   handleDelete,
@@ -15,34 +16,35 @@ export function MessageList({
   handleDelete: (id: string) => void;
   handleEditMessage: (message: GroupDomain.MessageEntity) => void;
 }) {
-  if (!messages.length) {
-    return null;
-  }
-  console.log("Messages:", messages);
+  const groupedMessages = useMemo(
+    () => groupMessagesByDate(messages),
+    [messages],
+  );
 
-  const groupedMessages = groupMessagesByDate(messages);
+  if (!messages.length) return null;
 
   return Object.entries(groupedMessages).map(([dateLabel, msgs]) => (
-      <div key={dateLabel} className="space-y-3">
-        <div className="flex justify-center">
-          <Badge className="py-2 bg-muted text-white">{dateLabel}</Badge>
-        </div>
-
-        {msgs.map((message: GroupDomain.MessageEntity) => (
-          <MessageCard
-            key={message.id}
-            message={message}
-            userId={userId}
-            onEdit={handleEditMessage}
-            deleteAction={
-              <DeleteMessageButton
-                onSuccess={() => handleDelete(message.id)}
-                messageId={message.id}
-              />
-            }
-          />
-        ))}
+    <div key={dateLabel} className="space-y-4">
+      <div className="flex justify-center">
+        <Badge className="text-xs sm:text-sm py-2 bg-muted text-white">
+          {dateLabel}
+        </Badge>
       </div>
-    ))
 
-}
+      {msgs.map((message) => (
+        <MessageCard
+          key={message.id}
+          message={message}
+          userId={userId}
+          onEdit={handleEditMessage}
+          deleteAction={
+            <DeleteMessageButton
+              onSuccess={() => handleDelete(message.id)}
+              messageId={message.id}
+            />
+          }
+        />
+      ))}
+    </div>
+  ));
+});

@@ -10,29 +10,22 @@ export interface TypingEvent {
   };
 }
 
-export function useTyping(typingEvents: TypingEvent) {
+export function useTyping(typingEvent: TypingEvent | undefined) {
   const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (typingEvents?.type === "typing") {
+    if (typingEvent?.type === "typing") {
       setTypingUsers((prev) => {
-        const updatedUsers = {
-          ...prev,
-          [typingEvents.data.userId]: typingEvents.data.isTyping,
-        };
-
-        if (!typingEvents.data.isTyping) {
-          setTypingUsers((prev) => {
-            const newState = { ...prev };
-            delete newState[typingEvents.data.userId];
-            return newState;
-          });
+        const newState = { ...prev };
+        if (typingEvent.data.isTyping) {
+          newState[typingEvent.data.userId] = true;
+        } else {
+          delete newState[typingEvent.data.userId];
         }
-
-        return updatedUsers;
+        return newState;
       });
     }
-  }, [typingEvents]);
+  }, [typingEvent]);
 
   return { typingUsers };
 }

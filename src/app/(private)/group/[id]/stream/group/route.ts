@@ -1,5 +1,4 @@
 import {
-  addMemberToGroupStream,
   deleteGroupStream,
   getGroupStream,
   updateGroupStream,
@@ -8,4 +7,3 @@ import {
 export const GET = getGroupStream;
 export const DELETE = deleteGroupStream;
 export const PATCH = updateGroupStream;
-export const POST = addMemberToGroupStream;

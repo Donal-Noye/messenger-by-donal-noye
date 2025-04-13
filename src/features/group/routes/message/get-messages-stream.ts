@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { getCurrentUser } from "@/entities/user/server";
-import {getGroupById, getGroupList, groupEvents} from "@/entities/group/server";
+import { getGroupById } from "@/entities/group/server";
 import { sseStream } from "@/shared/lib/sse/server";
-import {getMessages, messageEvents} from "@/entities/message/server";
+import { getMessages, messageEvents } from "@/entities/message/server";
 
 export async function getMessagesStream(
   req: NextRequest,

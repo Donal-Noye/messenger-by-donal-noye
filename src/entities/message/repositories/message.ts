@@ -1,5 +1,7 @@
 import { prisma } from "@/shared/lib/db";
 import { Prisma } from "@prisma/client";
+import { GroupDomain } from "@/entities/group";
+import { QueryParams } from "@/entities/message/types";
 
 async function sendMessage(data: Prisma.MessageCreateInput) {
   return prisma.message.create({
@@ -7,15 +9,18 @@ async function sendMessage(data: Prisma.MessageCreateInput) {
   });
 }
 
-async function getMessages(where: Prisma.MessageWhereInput) {
+async function getMessages(
+  params: QueryParams = {},
+): Promise<GroupDomain.MessageEntity[]> {
+  const { limit = 20, where = {}, orderBy = { createdAt: "asc" } } = params;
+
   return prisma.message.findMany({
     where,
     include: {
       user: true,
     },
-    orderBy: {
-      createdAt: "asc",
-    },
+    take: limit,
+    orderBy,
   });
 }
 
@@ -25,14 +30,11 @@ async function getMessage(where: Prisma.MessageWhereInput) {
   });
 }
 
-async function updateMessage(
-  messageId: string,
-  content: string,
-) {
+async function updateMessage(messageId: string, content: string) {
   return prisma.message.update({
     where: { id: messageId },
     data: {
-      content
+      content,
     },
   });
 }

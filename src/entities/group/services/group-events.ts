@@ -19,7 +19,16 @@ type GroupMemberAdd = {
     member: GroupDomain.MemberEntity;
   };
 };
-type GroupEvent = GroupChanged | GroupCreated | GroupDeleted | GroupMemberAdd;
+type MemberRemoved = {
+  type: "member-removed";
+  data: { groupId: string; memberId: string };
+};
+type GroupEvent =
+  | GroupChanged
+  | GroupCreated
+  | GroupDeleted
+  | GroupMemberAdd
+  | MemberRemoved;
 
 class GroupEventsService {
   eventsChannel = new EventsChannel("group");
@@ -51,21 +60,24 @@ class GroupEventsService {
     });
   }
 
+  async addMemberDeletedListener(groupId: string, listener: (event: MemberRemoved) => void) {
+    return this.eventsChannel.concume(groupId, (data) => {
+      listener(data as MemberRemoved);
+    });
+  }
+
   emit(event: GroupEvent) {
-    if (event.type === "group-changed") {
-      return this.eventsChannel.emit("group-changed", event);
-    }
-
-    if (event.type === "group-created") {
-      return this.eventsChannel.emit("group-created", event);
-    }
-
-    if (event.type === "group-deleted") {
-      return this.eventsChannel.emit("group-deleted", event);
-    }
-
-    if (event.type === "member-added") {
-      return this.eventsChannel.emit(event.data.groupId, event);
+    switch (event.type) {
+      case "group-changed":
+        return this.eventsChannel.emit("group-changed", event);
+      case "group-created":
+        return this.eventsChannel.emit("group-created", event);
+      case "group-deleted":
+        return this.eventsChannel.emit("group-deleted", event);
+      case "member-added":
+        return this.eventsChannel.emit(event.data.groupId, event);
+      case "member-removed":
+        return this.eventsChannel.emit(event.data.groupId, event);
     }
   }
 }

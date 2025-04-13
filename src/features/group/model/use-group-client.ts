@@ -6,25 +6,35 @@ import { useSendMessageForm } from "@/features/group/model/use-send-message-form
 import { routes } from "@/kernel/routes";
 import { useEventSource } from "@/shared/lib/sse/client";
 import { TypingEvent, useTyping } from "@/features/group/model/use-typing";
-import {useCallback, useLayoutEffect, useRef, useState} from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 export function useGroupClient({
   defaultGroup,
   userId,
   initialMessages,
+  initialMembers,
 }: {
   defaultGroup: GroupDomain.GroupEntity;
   userId: string;
   initialMessages: GroupDomain.MessageEntity[];
+  initialMembers: GroupDomain.MemberEntity[];
 }) {
   const { dataStream: group = defaultGroup } =
     useEventSource<GroupDomain.GroupEntity>(
-      routes.groupStream(defaultGroup.id),
+      useMemo(() => routes.groupStream(defaultGroup.id), [defaultGroup.id]),
     );
 
-  const { dataStream: messages = initialMessages, setData: setMessagesData } = useEventSource<
-    GroupDomain.MessageEntity[]
-  >(routes.messageStream(defaultGroup.id));
+  const { dataStream: members = initialMembers, setData: setMembersData } =
+    useEventSource<GroupDomain.MemberEntity[]>(
+      useMemo(() => routes.membersStream(defaultGroup.id), [defaultGroup.id]),
+    );
+
+  const {
+    dataStream: messages = initialMessages,
+    setData: setMessagesData,
+  } = useEventSource<GroupDomain.MessageEntity[]>(
+    useMemo(() => routes.messageStream(defaultGroup.id), [defaultGroup.id]),
+  );
 
   const [editingMessage, setEditingMessage] = useState<{
     id: string;
@@ -38,7 +48,7 @@ export function useGroupClient({
     [],
   );
 
-  const handleDelete = useCallback(
+  const handleDeleteMessage = useCallback(
     (deletedMessageId: string) => {
       setMessagesData((prev) => prev?.filter((m) => m.id !== deletedMessageId));
     },
@@ -97,8 +107,10 @@ export function useGroupClient({
     onSubmitMessage,
     editingMessage,
     setEditingMessage,
-    handleDelete,
+    handleDeleteMessage,
     handleEditMessage,
     messagesEndRef,
+    members,
+    setMembersData,
   };
 }

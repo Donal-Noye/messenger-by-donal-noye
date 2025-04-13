@@ -1,50 +1,56 @@
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { cn } from "@/shared/lib/css";
 import { routes } from "@/kernel/routes";
 import { Button } from "@/shared/ui/button";
-import { GroupDomain } from "@/entities/group";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { memo, useCallback } from "react";
 
-export function GroupCard({
-  group,
-  userId,
-}: {
-  group: GroupDomain.GroupEntity;
-  userId: string;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
+const GroupAvatar = memo(({ name }: { name?: string }) => (
+  <Avatar className="w-12 h-12 lg:w-9 lg:h-9">
+    <AvatarFallback className="font-medium text-sm lg:text-xs">
+      {name ? name[0].toUpperCase() : "G"}
+    </AvatarFallback>
+  </Avatar>
+));
+GroupAvatar.displayName = "GroupAvatar";
 
-  // const lastMessage = group.messages.at(-1);
-  // const senderName =
-  //   lastMessage?.user?.id === userId ? "You" : lastMessage?.user?.name || "";
+const GroupName = memo(({ name }: { name: string }) => (
+  <div className="flex flex-col items-start truncate">
+    <p className="text-primary text-lg lg:text-base">{name}</p>
+  </div>
+));
+GroupName.displayName = "GroupName";
 
-  return (
-    <Button
-      variant="ghost"
-      className={cn(
-        "justify-start h-14 rounded-2xl gap-3",
-        pathname === routes.group(group.id) ? "bg-accent" : "",
-      )}
-      onClick={() => router.push(routes.group(group.id))}
-    >
-      <Avatar className="w-9 h-9">
-        <AvatarFallback className="font-medium text-xs">
-          {group.name ? group.name[0].toUpperCase() : "G"}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex flex-col items-start truncate">
-        <p className="text-primary text-base">{group.name}</p>
-        {/*{group.messages.length !== 0 && (*/}
-        {/*  <div className="flex items-center gap-1 text-secondary">*/}
-        {/*    <p>{senderName}</p>*/}
-        {/*    <span>-</span>*/}
-        {/*    <p>*/}
-        {/*      {lastMessage?.content}*/}
-        {/*    </p>*/}
-        {/*  </div>*/}
-        {/*)}*/}
-      </div>
-    </Button>
-  );
-}
+export const GroupCard = memo(
+  function GroupCard({
+    group: { id, name },
+    isActive,
+  }: {
+    group: { id: string; name?: string };
+    isActive: boolean;
+  }) {
+    const router = useRouter();
+
+    const handleClick = useCallback(() => {
+      router.push(routes.group(id));
+    }, [router, id]);
+
+    return (
+      <Button
+        variant="ghost"
+        className={cn(
+          "justify-start h-14 rounded-2xl gap-4 sm:gap-3",
+          isActive ? "bg-accent" : "",
+        )}
+        onClick={handleClick}
+      >
+        <GroupAvatar name={name} />
+        {name && <GroupName name={name} />}
+      </Button>
+    );
+  },
+  (prev, next) =>
+    prev.group.id === next.group.id &&
+    prev.group.name === next.group.name &&
+    prev.isActive === next.isActive,
+);

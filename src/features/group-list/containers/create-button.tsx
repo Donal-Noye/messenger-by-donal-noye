@@ -5,9 +5,9 @@ import { Loader, PlusIcon } from "lucide-react";
 import { useActionState } from "@/shared/lib/react";
 import { createGroupAction } from "@/features/group-list/actions/create-group";
 import { right } from "@/shared/lib/either";
-import { startTransition } from "react";
+import { memo, startTransition } from "react";
 
-export function CreateButton({
+export const CreateButton = memo(function CreateButton({
   onSuccess,
 }: {
   onSuccess?: (groupId: string) => void;
@@ -29,4 +29,4 @@ export function CreateButton({
       {isPending ? <Loader className="animate-spin" /> : <PlusIcon />}
     </Button>
   );
-}
+});

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { deleteGroupAction } from "@/features/group/actions/delete-group";
 import { useRouter } from "next/navigation";
-import { startTransition, useEffect, useState } from "react";
+import {startTransition, useEffect, useState} from "react";
 import { routes } from "@/kernel/routes";
 import { updateGroupAction } from "@/features/group/actions/update-group";
 import { useActionState } from "@/shared/lib/react";

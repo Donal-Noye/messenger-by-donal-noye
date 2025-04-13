@@ -7,11 +7,9 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { LogOut } from "lucide-react";
-import { routes } from "@/kernel/routes";
-import { sessionService } from "../services/session";
-import { redirect } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { cn } from "@/shared/lib/css";
+import {logout} from "@/features/auth/server";
 
 export function UserDropdown({
   name,
@@ -24,8 +22,8 @@ export function UserDropdown({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar className={cn("w-14 h-14", className)}>
+      <DropdownMenuTrigger asChild className="cursor-pointer">
+        <Avatar className={cn("w-12 h-12 sm:w-14 sm:h-14", className)}>
           <AvatarImage src={avatar} alt="" />
           <AvatarFallback className="font-bold">
             {name ? name[0].toUpperCase() : "G"}
@@ -38,11 +36,7 @@ export function UserDropdown({
         <DropdownMenuItem className="text-base text-red-500">
           <form
             className="w-full"
-            action={async () => {
-              "use server";
-              await sessionService.deleteSession();
-              redirect(routes.signIn());
-            }}
+            action={logout}
           >
             <button className="flex items-center justify-between w-full">
               Logout

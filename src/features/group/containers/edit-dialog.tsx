@@ -15,8 +15,9 @@ import { DialogLayout } from "@/shared/ui/dialog-layout";
 import { SubmitButton } from "@/features/auth/ui/submit-button";
 import { updateGroupFormSchema } from "@/features/group/model/use-group-edit-form";
 import { z } from "zod";
+import { memo } from "react";
 
-export function GroupEditDialog({
+export const GroupEditDialog = memo(function GroupEditDialog({
   onDeleteAction,
   onSubmitAction,
   form,
@@ -75,4 +76,4 @@ export function GroupEditDialog({
       )}
     </DialogLayout>
   );
-}
+});

@@ -30,11 +30,11 @@ export function AuthFormLayout({
 }) {
   return (
     <Card className="w-96 border-none">
-      <CardHeader className="mb-4">
-        <CardTitle className="text-4xl font-medium text-center text-primary mb-2">
+      <CardHeader className="md:mb-4">
+        <CardTitle className="text-4xl font-medium md:text-center text-primary md:mb-2">
           {title}
         </CardTitle>
-        <CardDescription className="text-center text-base">
+        <CardDescription className="md:text-center text-base">
           {description}
         </CardDescription>
       </CardHeader>

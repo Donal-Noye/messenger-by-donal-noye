@@ -12,16 +12,6 @@ async function groupList(userId: string) {
     },
     include: {
       creator: true,
-      // members: {
-      //   include: {
-      //     user: true,
-      //   },
-      // },
-      // messages: {
-	    //   include: {
-		  //     user: true,
-	    //   },
-      // },
     },
     orderBy: { lastMessageAt: "desc" },
   });
@@ -32,18 +22,11 @@ async function getGroup(where: Prisma.GroupWhereUniqueInput) {
     where,
     include: {
       creator: true,
-      // members: {
-      //   include: {
-      //     user: true
-      //   }
-      // },
-    }
+    },
   });
 }
 
-async function createGroup(
-  data: Prisma.GroupCreateInput,
-) {
+async function createGroup(data: Prisma.GroupCreateInput) {
   const group = await prisma.group.create({
     data,
     include: {
@@ -62,21 +45,12 @@ async function createGroup(
   };
 }
 
-async function updateGroup(
-  groupId: string,
-  data: Prisma.GroupUpdateInput,
-) {
+async function updateGroup(groupId: string, data: Prisma.GroupUpdateInput) {
   return prisma.group.update({
     where: { id: groupId },
     data,
     include: {
       creator: true,
-      // messages: true,
-      // members: {
-      //   include: {
-      //     user: true,
-      //   },
-      // },
     },
   });
 }
@@ -95,9 +69,7 @@ async function deleteGroup(groupId: string) {
   });
 }
 
-async function addMemberToGroup(
-  data: Prisma.GroupMemberCreateInput,
-) {
+async function addMemberToGroup(data: Prisma.GroupMemberCreateInput) {
   return prisma.groupMember.create({
     data,
     include: {
@@ -106,9 +78,13 @@ async function addMemberToGroup(
   });
 }
 
-async function getMembersByGroupId(
-  groupId: string,
-) {
+async function removeMemberInGroup(memberId: string) {
+  return prisma.groupMember.delete({
+    where: { id: memberId },
+  });
+}
+
+async function getMembersByGroupId(groupId: string) {
   return prisma.groupMember.findMany({
     where: {
       groupId: groupId,
@@ -127,4 +103,5 @@ export const groupRepository = {
   addMemberToGroup,
   updateGroup,
   getMembersByGroupId,
+  removeMemberInGroup,
 };

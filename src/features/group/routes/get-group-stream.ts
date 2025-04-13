@@ -25,11 +25,6 @@ export async function getGroupStream(
       write(event.data),
     );
 
-    const unwatchMember = await groupEvents.addMemberAddedListener(
-      group.id,
-      (event) => write(event.data),
-    );
-
     const unwatchDelete = await groupEvents.addGroupDeletedListener(
       ({ data }) => {
         if (data.groupId === group.id) {
@@ -40,7 +35,6 @@ export async function getGroupStream(
 
     addCloseListener(() => {
       unwatchChange();
-      unwatchMember();
       unwatchDelete();
     });
 

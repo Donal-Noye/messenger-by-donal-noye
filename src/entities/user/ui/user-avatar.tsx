@@ -8,10 +8,8 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { LogOut } from "lucide-react";
-import { routes } from "@/kernel/routes";
-import { sessionService } from "../services/session";
-import { redirect } from "next/navigation";
 import { cn } from "@/shared/lib/css";
+import {logout} from "@/features/auth/actions/logout";
 
 export function UserAvatar({
   name,
@@ -39,11 +37,7 @@ export function UserAvatar({
         <DropdownMenuItem className="text-base text-red-500">
           <form
             className="w-full"
-            action={async () => {
-              "use server";
-              await sessionService.deleteSession();
-              redirect(routes.signIn());
-            }}
+            action={logout}
           >
             <button className="flex items-center justify-between w-full">
               Logout

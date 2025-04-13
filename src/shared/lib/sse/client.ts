@@ -15,26 +15,37 @@ export function useEventSource<T>(url: string, onData?: (data: T) => void) {
 
     groupEvents.addEventListener("message", (message) => {
       try {
-        const data = JSON.parse(message.data);
+        const parsedData = JSON.parse(message.data);
 
-        if (!data) return;
+        if (!parsedData) return;
 
-        if (data.name) {
-          setGroupName(data.name);
+        if (parsedData.name) {
+          setGroupName(parsedData.name);
         }
 
-        switch (data.type) {
-          case "group-deleted":
-            toast({
-              description: `Group "${groupName}" was deleted`,
-            });
-            router.push("/");
-            break;
-          default:
-            setData(data);
+        if (parsedData.type === "message-created" || parsedData.type === "message-deleted") {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          setData((prev) => {
+            if (Array.isArray(prev)) {
+              if (parsedData.type === "message-created") {
+                return [...prev, parsedData.data];
+              } else if (parsedData.type === "message-deleted") {
+                return prev.filter((msg) => msg.id !== parsedData.data.messageId);
+              }
+            }
+            return prev;
+          });
+        } else if (parsedData.type === "group-deleted") {
+          toast({
+            description: `Group "${groupName}" was deleted`,
+            variant: "destructive"
+          });
+          router.push("/");
         }
+        setData(parsedData);
         setError(undefined);
-        onData?.(data);
+        onData?.(parsedData);
         setIsPending(false);
       } catch (e) {
         console.log(e);

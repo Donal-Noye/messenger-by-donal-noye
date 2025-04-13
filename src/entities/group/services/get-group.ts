@@ -1,5 +1,6 @@
 import { groupRepository } from "@/entities/group/repositories/group";
+import { cache } from "react";
 
-export async function getGroupById(groupId: string) {
+export const getGroupById = cache(async (groupId: string) => {
   return groupRepository.getGroup({ id: groupId });
-}
+});

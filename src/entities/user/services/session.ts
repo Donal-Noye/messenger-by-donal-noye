@@ -6,8 +6,8 @@ import {
   userToSession,
 } from "@/entities/user/domain";
 import { cookies } from "next/headers";
-import {redirect} from "next/navigation";
-import {routes} from "@/kernel/routes";
+import { redirect } from "next/navigation";
+import { routes } from "@/kernel/routes";
 
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
@@ -26,8 +26,8 @@ async function decrypt(session: string | undefined = "") {
       algorithms: ["HS256"],
     });
     return payload as SessionEntity;
-  } catch {
-    console.log("Failed to verify session");
+  } catch (error) {
+    console.log("Failed to verify session: ", error);
   }
 }
 
@@ -49,7 +49,10 @@ async function addSession(user: UserEntity) {
 
 async function updateSession(sessionData: SessionEntity) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const encryptedSession = await encrypt({ ...sessionData, expiredAt: expiresAt.toISOString() });
+  const encryptedSession = await encrypt({
+    ...sessionData,
+    expiredAt: expiresAt.toISOString(),
+  });
 
   const cookieStore = await cookies();
   cookieStore.set("session", encryptedSession, {
@@ -59,7 +62,6 @@ async function updateSession(sessionData: SessionEntity) {
     path: "/",
   });
 }
-
 
 async function deleteSession() {
   const cookieStore = await cookies();
@@ -77,4 +79,9 @@ async function verifySession() {
   return { isAuth: true, session };
 }
 
-export const sessionService = { addSession, deleteSession, verifySession, updateSession };
+export const sessionService = {
+  addSession,
+  deleteSession,
+  verifySession,
+  updateSession,
+};

@@ -17,6 +17,8 @@ export function useAccountForm(session: UserDomain.SessionEntity) {
 			const result = await updateUserAction(session, {
 				name: values.name,
 				email: values.email,
+				status: values.status,
+				phone: values.phone,
 			});
 			if (result.type === "right") {
 				toast({

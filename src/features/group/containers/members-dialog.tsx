@@ -12,19 +12,24 @@ import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { useMembersDialog } from "@/features/group/model/use-members-dialog";
 import { DialogLayout } from "@/shared/ui/dialog-layout";
 import { GroupDomain } from "@/entities/group";
-import { SearchIcon } from "lucide-react";
+import { Loader, SearchIcon } from "lucide-react";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 import { SubmitButton } from "@/features/auth/ui/submit-button";
+import { memo, startTransition } from "react";
 
-export function MembersDialog({
+export const MembersDialog = memo(function MembersDialog({
+  userId,
   groupId,
   members,
   onAddMember,
+  handleRemoveMember,
   creatorId,
 }: {
+  userId: string;
   groupId: string;
   members: GroupDomain.MemberEntity[];
   onAddMember: (newMember: GroupDomain.MemberEntity) => void;
+  handleRemoveMember: (memberId: string) => void;
   creatorId: string;
 }) {
   const {
@@ -34,11 +39,19 @@ export function MembersDialog({
     filteredMembers,
     handleAddMember,
     isPending,
-  } = useMembersDialog(groupId, members, onAddMember);
+    dispatchRemove,
+    isPendingRemove,
+  } = useMembersDialog(
+    userId,
+    groupId,
+    members,
+    onAddMember,
+    handleRemoveMember,
+  );
 
   return (
     <DialogLayout
-      className="min-w-[640px]"
+      className="sm:min-w-[640px]"
       trigger={
         <Button variant="link" className="text-[#6E6E6E] p-0 h-auto">
           {members.length} members
@@ -87,24 +100,43 @@ export function MembersDialog({
           />
         </div>
       </div>
-      <ScrollArea>
+      <ScrollArea className="h-48">
         {filteredMembers.map((member) => (
-          <Card key={member.id} className="flex items-center space-x-4 py-2">
-            <Avatar>
-              <AvatarImage src="" alt="" />
-              <AvatarFallback>
-                {member.user?.name.slice(0, 1).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="space-y-1.5">
-              <CardTitle>{member.user?.name}</CardTitle>
-              {member.userId === creatorId && (
-                <CardDescription>Creator</CardDescription>
-              )}
+          <Card
+            key={member.id}
+            className="flex items-center py-2 justify-between"
+          >
+            <div className="flex items-center space-x-4">
+              <Avatar>
+                <AvatarImage src="" alt="" />
+                <AvatarFallback>
+                  {member.user?.name.slice(0, 1).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-1.5">
+                <CardTitle>{member.user?.name}</CardTitle>
+                {member.userId === creatorId && (
+                  <CardDescription>Creator</CardDescription>
+                )}
+              </div>
             </div>
+            {userId === creatorId && member.userId !== creatorId && (
+              <Button
+                disabled={isPendingRemove}
+                onClick={() => startTransition(() => dispatchRemove(member.id))}
+                variant="destructive"
+                size="sm"
+              >
+                {isPendingRemove ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  <p>Remove</p>
+                )}
+              </Button>
+            )}
           </Card>
         ))}
       </ScrollArea>
     </DialogLayout>
   );
-}
+});

@@ -9,19 +9,20 @@ export const Typing = ({
   userId: string;
   members: GroupDomain.MemberEntity[];
 }) => {
+  const otherUsers = Object.keys(typingUsers).filter((id) => id !== userId);
+  if (otherUsers.length === 0) return null;
+
+  const names = otherUsers
+    .map((id) => {
+      const member = members.find((m) => m.userId === id);
+      return member?.user?.name || "Unknown user";
+    })
+    .filter(Boolean)
+    .join(", ");
+
   return (
-    Object.keys(typingUsers).filter((id) => id !== userId).length > 0 && (
-      <div className="text-sm text-secondary animate-pulse">
-        {Object.keys(typingUsers)
-          .filter((id) => id !== userId)
-          .map((id) => {
-            const member = members.find((m) => m.userId === id);
-            return member?.user?.name || "Unknown user";
-          })
-          .filter(Boolean)
-          .join(", ")}{" "}
-        is typing...
-      </div>
-    )
+    <div className="text-sm text-secondary animate-pulse">
+      {names} is typing...
+    </div>
   );
 };

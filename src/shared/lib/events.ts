@@ -1,12 +1,12 @@
-import amqplib, { Connection } from "amqplib";
+import {connect, ChannelModel} from "amqplib";
 
-let connection: Connection | undefined = undefined;
+let connection: ChannelModel | undefined = undefined;
 export class EventsChannel {
 	constructor(private channelName: string) {}
 
 	async createChannel() {
 		if (!connection) {
-			connection = await amqplib.connect(process.env.MB_URL!);
+			connection = await connect(process.env.MB_URL!);
 		}
 
 		const channel = await connection.createChannel();

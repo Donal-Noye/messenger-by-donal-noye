@@ -25,12 +25,15 @@ export function PasswordForm({
     <>
       <h3 className="text-2xl font-medium text-primary mb-8">Password</h3>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6 md:space-y-4"
+        >
           <FormField
             control={form.control}
             name="currentPassword"
             render={({ field }) => (
-              <FormItem className="grid grid-cols-2 items-center">
+              <FormItem className="flex flex-col md:grid md:grid-cols-[0.5fr_1fr] lg:grid-cols-2 md:items-center">
                 <FormLabel className="text-secondary">
                   Current Password
                 </FormLabel>
@@ -51,7 +54,7 @@ export function PasswordForm({
             control={form.control}
             name="newPassword"
             render={({ field }) => (
-              <FormItem className="grid grid-cols-2 items-center">
+              <FormItem className="flex flex-col md:grid md:grid-cols-[0.5fr_1fr] lg:grid-cols-2 md:items-center">
                 <FormLabel className="text-secondary">New Password</FormLabel>
                 <FormControl>
                   <Input
@@ -70,7 +73,7 @@ export function PasswordForm({
             control={form.control}
             name="confirmPassword"
             render={({ field }) => (
-              <FormItem className="grid grid-cols-2 items-center">
+              <FormItem className="flex flex-col md:grid md:grid-cols-[0.5fr_1fr] lg:grid-cols-2 md:items-center">
                 <FormLabel className="text-secondary">
                   Confirm Password
                 </FormLabel>
@@ -87,7 +90,11 @@ export function PasswordForm({
               </FormItem>
             )}
           />
-          <SubmitButton isPending={isPending} className="w-auto">
+          <SubmitButton
+            isPending={isPending}
+            disabled={!form.formState.isDirty}
+            className="w-auto"
+          >
             Update Password
           </SubmitButton>
         </form>

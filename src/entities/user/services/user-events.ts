@@ -1,9 +1,11 @@
 import { EventsChannel } from "@/shared/lib/events";
-import { UserDomain } from "@/entities/user";
 
 type UserOnlineEvent = {
 	type: "user-online";
-	data: UserDomain.UserEntity;
+	data: {
+		userId: string;
+		isOnline: boolean;
+	};
 };
 
 class UserEventsService {

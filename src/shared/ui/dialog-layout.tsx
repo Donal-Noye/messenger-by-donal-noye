@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import {memo, ReactNode} from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/shared/ui/dialog";
 
-export function DialogLayout({
+export const DialogLayout = memo(function DialogLayout({
   isOpen,
   onOpenChange,
   trigger,
@@ -41,4 +41,4 @@ export function DialogLayout({
       </DialogContent>
     </Dialog>
   );
-}
+})

@@ -4,7 +4,7 @@ export type SessionEntity = {
 	avatar?: string;
 	isOnline?: boolean;
 	status?: string;
-	phone?: number;
+	phone?: string;
 	lastSeen?: Date;
 	name: string;
 	expiredAt: string;
@@ -17,7 +17,7 @@ export type UserEntity = {
 	avatar?: string | null;
 	isOnline?: boolean | null;
 	status?: string | null;
-	phone?: number | null;
+	phone?: string | null;
 	lastSeen?: Date;
 	passwordHash: string;
 	salt: string;

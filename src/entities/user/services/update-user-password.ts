@@ -33,9 +33,15 @@ export async function updateUserPassword(
   });
 
   await sessionService.updateSession({
-    ...user,
+    id: user.id,
+    email: user.email,
+    name: user.name,
     expiredAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     avatar: user.avatar ?? undefined,
+    isOnline: user.isOnline ?? undefined,
+    status: user.status ?? undefined,
+    phone: user.phone ?? undefined,
+    lastSeen: user.lastSeen ?? undefined,
   });
 
   return right(user)
